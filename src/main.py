@@ -1,3 +1,4 @@
+from ast import NodeTransformer
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -62,13 +63,12 @@ class Window(QWidget):
     def GetRandomNote(self, beforeFile=""):
         files = []
 
-        for file in os.listdir(self.notesPath):
-            if file == beforeFile:
-                continue
-            files.append(file)
+        for file in self.notes:
+            if file != beforeFile:
+                files.append(file)
 
         randomFile = random.choice(files)
-        return os.path.join(self.notesPath, randomFile)
+        return randomFile
 
             
 if __name__ == "__main__":
