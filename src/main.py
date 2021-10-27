@@ -1,8 +1,8 @@
-from ast import NodeTransformer
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys, random
+
 
 class Window(QWidget):
     def __init__(self, title, shape, icon):
@@ -32,24 +32,39 @@ class Window(QWidget):
         self.setWindowIcon(self.icon)
         self.setGeometry(self.x, self.y, self.w, self.h)
 
-        self.firstChoiceBtn = QPushButton()
-        self.secondChoiceBtn = QPushButton()
-        self.thirdChoiceBtn = QPushButton()
-        self.fourthChoiceBtn = QPushButton()
-        self.choiceBtns = [self.firstChoiceBtn, self.secondChoiceBtn, self.thirdChoiceBtn, self.fourthChoiceBtn]
+        self.firstChoiceBtn = QPushButton(clicked=lambda : self.CheckNote(self.file, self.firstChoiceBtn))
+        self.secondChoiceBtn = QPushButton(clicked=lambda : self.CheckNote(self.file, self.secondChoiceBtn))
+        self.thirdChoiceBtn = QPushButton(clicked=lambda : self.CheckNote(self.file, self.thirdChoiceBtn))
+        self.fourthChoiceBtn = QPushButton(clicked=lambda : self.CheckNote(self.file, self.fourthChoiceBtn))
 
-        self.firstChoiceBtn.clicked.connect(lambda : self.CheckNote(self.file, self.firstChoiceBtn.text()))
-        self.secondChoiceBtn.clicked.connect(lambda : self.CheckNote(self.file, self.secondChoiceBtn.text()))
-        self.thirdChoiceBtn.clicked.connect(lambda : self.CheckNote(self.file, self.thirdChoiceBtn.text()))
-        self.fourthChoiceBtn.clicked.connect(lambda : self.CheckNote(self.file, self.fourthChoiceBtn.text()))
+        self.choiceBtns = [self.firstChoiceBtn, self.secondChoiceBtn, self.thirdChoiceBtn, self.fourthChoiceBtn]
 
         self.fileLabel = QLabel()
         self.fileLabel.setAlignment(Qt.AlignCenter)
         self.file = self.LoadFile()
-        self.vbox.addWidget(self.fileLabel)
 
+        self.results = QHBoxLayout()
+        self.totalCorrectLabel = QLabel(text="0")
+        self.totalWrongLabel = QLabel(text="0")
+        self.totalCorrectLabel.setAlignment(Qt.AlignCenter)
+        self.totalWrongLabel.setAlignment(Qt.AlignCenter)
+        self.totalCorrectLabel.setStyleSheet("color: green; font-size: 20px;")
+        self.totalWrongLabel.setStyleSheet("color: red; font-size: 20px;")
+        self.results.addWidget(self.totalCorrectLabel)
+        self.results.addWidget(self.totalWrongLabel)
+
+        self.nextBtn = QPushButton(text="Next", clicked=lambda : self.NextQuestion(self.file))
+        self.nextBtn.setVisible(False)
+
+        self.resetBtn = QPushButton(text="Reset", clicked=lambda : self.Reset(self.file))
+
+        self.vbox.addWidget(self.resetBtn)
+        self.vbox.addLayout(self.results)
+        self.vbox.addWidget(self.fileLabel)
         for choiceBtn in self.choiceBtns:
             self.vbox.addWidget(choiceBtn)
+        self.vbox.addStretch()
+        self.vbox.addWidget(self.nextBtn)
 
     def SetChoices(self, file):
         choices = []
@@ -62,11 +77,10 @@ class Window(QWidget):
                 choices.append(randomNote)
         random.shuffle(choices)
 
-        self.firstChoiceBtn.setText(choices[0])
-        self.secondChoiceBtn.setText(choices[1])
-        self.thirdChoiceBtn.setText(choices[2])
-        self.fourthChoiceBtn.setText(choices[3])
-
+        i = 0
+        while i < 4:
+            self.choiceBtns[i].setText(choices[i])
+            i += 1
 
     def LoadFile(self, beforeFile=""):
         file = self.GetRandomNote(beforeFile)
@@ -75,13 +89,34 @@ class Window(QWidget):
         self.SetChoices(file)
         return file
 
-    def CheckNote(self, file, answer):
+    def Reset(self, beforeFile=""):
+        self.NextQuestion(beforeFile)
+        self.totalCorrectLabel.setText("0")
+        self.totalWrongLabel.setText("0")
+    
+    def NextQuestion(self, beforeFile):
+        self.file = self.LoadFile(beforeFile)
+        for choiceBtn in self.choiceBtns:
+            choiceBtn.setDisabled(False)
+            choiceBtn.setStyleSheet("background-color: none;")
+        self.nextBtn.setVisible(False)
+
+    def CheckNote(self, file, btn:QPushButton):
         result = self.notes[file]
-        if answer == result:
-            QMessageBox.information(self, "Doğru", "Cevabınız doğru!")
-            self.file = self.LoadFile(file)
+        if btn.text() == result:
+            btn.setStyleSheet("background-color: green;")
+            self.totalCorrectLabel.setText(str(int(self.totalCorrectLabel.text()) + 1))
         else:
-            QMessageBox.warning(self, "Yanlış", "Cevabınız yanlış!")
+            btn.setStyleSheet("background-color: red;")
+            self.totalWrongLabel.setText(str(int(self.totalWrongLabel.text()) + 1))
+            for choiceBtn in self.choiceBtns:
+                if choiceBtn.text() == result:
+                    choiceBtn.setStyleSheet("background-color: green;")
+
+        for choiceBtn in self.choiceBtns:
+            choiceBtn.setDisabled(True)
+        
+        self.nextBtn.setVisible(True)
 
     def GetRandomNote(self, beforeFile=""):
         files = []
@@ -96,5 +131,5 @@ class Window(QWidget):
             
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = Window("Note Game", (100, 100, 0, 0), "./img/icon.jpg")
+    window = Window("Note Game", (100, 100, 0, 450), "./img/icon.jpg")
     app.exec_()
