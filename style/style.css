@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Roboto:ital,wght@1,300&display=swap');
+* {
+    font-size: 18px;
+}
+
+QWidget {
+    background-color: #fff;
+}
+
+QPushButton {
+    background-color: #1c0a5f;
+    border: none;
+    border-radius: 3px;
+    color: #fff;
+    padding: 8px 0;
+    margin: 3px 0;
+}
+
+QLabel {
+    background-color: #ebebeb;
+    font-size: 30px;
+    padding: 2px 0;
+    border-radius: 3px;
+    font-family: monospace, sans-serif;
+}

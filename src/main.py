@@ -3,29 +3,38 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys, random
 
+from PyQt5.sip import simplewrapper
+
 
 class Window(QWidget):
-    def __init__(self, title, shape, icon):
+    def __init__(self, title, shape, icon, style):
         super().__init__()
         self.title = title
         self.x, self.y, self.w, self.h = shape
         self.icon = QIcon(icon)
+        self.styleFile = style
         self.vbox = QVBoxLayout()
         self.notesPath = ".\\img\\notes\\"
         self.notes = {
             "{}1.png".format(self.notesPath): "kalın mi",
-            "{}2.png".format(self.notesPath): "kalın fa",
-            "{}3.png".format(self.notesPath): "sol",
-            "{}4.png".format(self.notesPath): "la",
-            "{}5.png".format(self.notesPath): "si",
-            "{}6.png".format(self.notesPath): "do",
-            "{}7.png".format(self.notesPath): "re",
-            "{}8.png".format(self.notesPath): "ince mi",
-            "{}9.png".format(self.notesPath): "ince fa",
+            "{}2.png".format(self.notesPath): "ince fa",
+            "{}3.png".format(self.notesPath): "ince mi",
+            "{}4.png".format(self.notesPath): "re",
+            "{}5.png".format(self.notesPath): "do",
+            "{}6.png".format(self.notesPath): "si",
+            "{}7.png".format(self.notesPath): "la",
+            "{}8.png".format(self.notesPath): "sol",
+            "{}9.png".format(self.notesPath): "kalın fa",
         }
         self.initUI()
+        self.SetStyle()
         self.setLayout(self.vbox)
         self.show()
+
+    def SetStyle(self):
+        with open(self.styleFile, "r") as f:
+            style = f.read()
+            self.setStyleSheet(style)
 
     def initUI(self):
         self.setWindowTitle(self.title)
@@ -40,6 +49,7 @@ class Window(QWidget):
         self.choiceBtns = [self.firstChoiceBtn, self.secondChoiceBtn, self.thirdChoiceBtn, self.fourthChoiceBtn]
 
         self.fileLabel = QLabel()
+        self.fileLabel.setStyleSheet("background-color: #fff;")
         self.fileLabel.setAlignment(Qt.AlignCenter)
         self.file = self.LoadFile()
 
@@ -48,15 +58,15 @@ class Window(QWidget):
         self.totalWrongLabel = QLabel(text="0")
         self.totalCorrectLabel.setAlignment(Qt.AlignCenter)
         self.totalWrongLabel.setAlignment(Qt.AlignCenter)
-        self.totalCorrectLabel.setStyleSheet("color: green; font-size: 20px;")
-        self.totalWrongLabel.setStyleSheet("color: red; font-size: 20px;")
+        self.totalCorrectLabel.setStyleSheet("color: #3ca81b;")
+        self.totalWrongLabel.setStyleSheet("color: #a12727;")
         self.results.addWidget(self.totalCorrectLabel)
         self.results.addWidget(self.totalWrongLabel)
 
-        self.nextBtn = QPushButton(text="Next", clicked=lambda : self.NextQuestion(self.file))
+        self.nextBtn = QPushButton(text=">>>", clicked=lambda : self.NextQuestion(self.file))
         self.nextBtn.setVisible(False)
 
-        self.resetBtn = QPushButton(text="Reset", clicked=lambda : self.Reset(self.file))
+        self.resetBtn = QPushButton(text="Sıfırla", clicked=lambda : self.Reset(self.file))
 
         self.vbox.addWidget(self.resetBtn)
         self.vbox.addLayout(self.results)
@@ -98,7 +108,7 @@ class Window(QWidget):
         self.file = self.LoadFile(beforeFile)
         for choiceBtn in self.choiceBtns:
             choiceBtn.setDisabled(False)
-            choiceBtn.setStyleSheet("background-color: none;")
+            choiceBtn.setStyleSheet("background-color: #1c0a5f;")
         self.nextBtn.setVisible(False)
 
     def CheckNote(self, file, btn:QPushButton):
@@ -131,5 +141,5 @@ class Window(QWidget):
             
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = Window("Note Game", (100, 100, 0, 450), "./img/icon.jpg")
+    window = Window("Note Game", (100, 100, 0, 700), "./img/icon.jpg", ".\\style\\style.css")
     app.exec_()
