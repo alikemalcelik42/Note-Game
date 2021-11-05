@@ -3,8 +3,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys, random
 
-from PyQt5.sip import simplewrapper
-
 
 class Window(QWidget):
     def __init__(self, title, shape, icon, style):
@@ -141,5 +139,5 @@ class Window(QWidget):
             
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = Window("Note Game", (100, 100, 0, 700), "./img/icon.jpg", ".\\style\\style.css")
+    window = Window("Note Game", (100, 100, 0, 700), "./img/icon.ico", ".\\style\\style.css")
     app.exec_()
